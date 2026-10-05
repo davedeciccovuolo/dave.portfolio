@@ -1,0 +1,294 @@
+# Console of "portfolio web dave" — Pages CMS (https://pagescms.org/docs/configuration/)
+# One collection per type: each type is a template with its own props (Dave's canvas, 2026-10-04).
+# Each work picks its props from its type's list. Audio is allowed on every type.
+# The info set of each type is MISSING: it gets defined together with the first real data.
+# Positions on the board (anchors) are set with the board tool and saved in content/lavagna.json.
+# The repo is public: upload a work only once it's ready to go public.
+
+media:
+  - name: immagini
+    label: Immagini
+    input: public/media/immagini
+    output: /media/immagini
+    categories: [image]
+    rename: safe
+  - name: splat
+    label: Gaussian splat
+    input: public/media/splat
+    output: /media/splat
+    extensions: [ply, spz, splat, ksplat, sog]
+    rename: safe
+  - name: video
+    label: Video
+    input: public/media/video
+    output: /media/video
+    categories: [video]
+    rename: safe
+  - name: audio
+    label: Audio
+    input: public/media/audio
+    output: /media/audio
+    categories: [audio]
+    rename: safe
+  - name: documenti
+    label: PDF
+    input: public/media/documenti
+    output: /media/documenti
+    extensions: [pdf]
+    rename: safe
+  - name: svg
+    label: SVG
+    input: public/media/svg
+    output: /media/svg
+    extensions: [svg]
+    rename: safe
+
+components:
+  titolo_it:
+    label: Titolo (italiano)
+    type: string
+    required: true
+  titolo_en:
+    label: Title (English)
+    type: string
+  slug:
+    label: "Indirizzo: parola nell'URL, solo minuscole, numeri e trattini"
+    type: string
+    required: true
+  discipline:
+    label: Discipline
+    type: reference
+    options:
+      collection: discipline
+      value: "{name}"
+      label: "{primary}"
+      multiple: true
+  celle:
+    label: Celle occupate sulla lavagna
+    type: object
+    fields:
+      - name: larghezza
+        label: Larghezza (celle)
+        type: number
+        options: { min: 1, max: 4 }
+      - name: altezza
+        label: Altezza (celle)
+        type: number
+        options: { min: 1, max: 4 }
+
+  # ---- props: each has its own properties, set per work ----
+  prop-biglietto:
+    type: object
+    label: biglietto da visita
+    fields:
+      - { name: fronte, label: Fronte, type: image, options: { media: immagini } }
+      - { name: retro, label: Retro, type: image, options: { media: immagini } }
+      - name: dettagli_luce
+        label: Dettagli visibili solo con la luce (maschera in bianco e nero)
+        type: image
+        options: { media: immagini }
+      - { name: inclinazione_telefono, label: Inclinazione del telefono, type: boolean, default: true }
+      - { name: oscillazione_lenta, label: Oscillazione lenta, type: boolean, default: true }
+      - { name: trascina_per_girare, label: Trascina per girare, type: boolean, default: true }
+      - { name: luce_col_mouse, label: Luce che segue il mouse, type: boolean, default: true }
+  prop-libro:
+    type: object
+    label: libro 3D sfogliabile
+    fields:
+      - name: pagine
+        label: Pagine (immagini in ordine)
+        type: image
+        options: { media: immagini, multiple: { max: 200 } }
+      - name: pdf
+        label: Oppure un PDF
+        type: file
+        options: { media: documenti }
+      - { name: trascina_pagina, label: Trascina la pagina, type: boolean, default: true }
+      - { name: clic_pagina, label: Clic / tocco sulla pagina, type: boolean, default: true }
+      - { name: frecce, label: Frecce della tastiera, type: boolean, default: true }
+      - { name: prendi_libro, label: Prendi il libro, type: boolean, default: true }
+  prop-splat:
+    type: object
+    label: 3D / gaussian splat
+    fields:
+      - name: file
+        label: File splat (.ply .spz .splat .ksplat .sog)
+        type: file
+        options: { media: splat }
+      - name: modo
+        label: Modo
+        type: select
+        options: { values: [oggetto, spazio] }
+      - { name: trascina_per_girare, label: "Oggetto: trascina per girare", type: boolean, default: true }
+      - { name: zoom, label: "Oggetto: zoom", type: boolean, default: true }
+      - { name: lancia_e_gira, label: "Oggetto: lancia e gira", type: boolean, default: true }
+      - { name: torna_indietro, label: "Oggetto: torna alla posizione", type: boolean, default: true }
+      - { name: cammina_tasti, label: "Spazio: cammina con i tasti", type: boolean, default: true }
+      - { name: salta_ai_punti, label: "Spazio: salta ai punti", type: boolean, default: true }
+      - { name: scroll_avanti, label: "Spazio: scroll = avanti", type: boolean, default: true }
+  prop-crt:
+    type: object
+    label: schermo CRT
+    fields:
+      - name: video
+        label: Registrazione dello schermo
+        type: file
+        options: { media: video }
+      - { name: sito, label: Sito dal vivo (indirizzo https://), type: string }
+      - name: immagini
+        label: Screenshot
+        type: image
+        options: { media: immagini, multiple: { max: 30 } }
+      - { name: demo, label: Demo del software (indirizzo https://), type: string }
+      - { name: accensione, label: Accensione / spegnimento, type: boolean, default: true }
+  prop-audio:
+    type: object
+    label: audio
+    fields:
+      - name: tracce
+        label: Tracce
+        type: file
+        options: { media: audio, multiple: { max: 30 } }
+  prop-svg:
+    type: object
+    label: animazione a schermo da SVG
+    fields:
+      - name: svg
+        label: SVG (l'animazione si costruisce pagina per pagina)
+        type: file
+        options: { media: svg, multiple: { max: 50 } }
+
+content:
+  - name: discipline
+    label: Discipline (tag)
+    type: collection
+    path: content/discipline
+    format: json
+    filename:
+      template: "{fields.slug}.json"
+      field: create
+    view:
+      fields: [nome_it, nome_en]
+      primary: nome_it
+    fields:
+      - { name: nome_it, label: Nome (italiano), type: string, required: true }
+      - { name: nome_en, label: Name (English), type: string }
+      - { name: slug, component: slug }
+
+  - name: branding
+    label: branding
+    type: collection
+    path: content/lavori/branding
+    format: json
+    filename: { template: "{fields.slug}.json", field: create }
+    view: { fields: [titolo_it, discipline], primary: titolo_it }
+    fields:
+      - { name: titolo_it, component: titolo_it }
+      - { name: titolo_en, component: titolo_en }
+      - { name: slug, component: slug }
+      - { name: discipline, component: discipline }
+      - { name: celle, component: celle }
+      - name: prop
+        label: Prop
+        type: block
+        list: true
+        blockKey: tipo
+        blocks:
+          - { name: libro, component: prop-libro }
+          - { name: splat, component: prop-splat }
+          - { name: biglietto, component: prop-biglietto }
+          - { name: audio, component: prop-audio }
+          - { name: svg, component: prop-svg }
+
+  - name: sito
+    label: sito
+    type: collection
+    path: content/lavori/sito
+    format: json
+    filename: { template: "{fields.slug}.json", field: create }
+    view: { fields: [titolo_it, discipline], primary: titolo_it }
+    fields:
+      - { name: titolo_it, component: titolo_it }
+      - { name: titolo_en, component: titolo_en }
+      - { name: slug, component: slug }
+      - { name: discipline, component: discipline }
+      - { name: celle, component: celle }
+      - name: prop
+        label: Prop
+        type: block
+        list: true
+        blockKey: tipo
+        blocks:
+          - { name: crt, component: prop-crt }
+          - { name: splat, component: prop-splat }
+          - { name: biglietto, component: prop-biglietto }
+          - { name: audio, component: prop-audio }
+
+  - name: lavori-manuali
+    label: lavori manuali / props
+    type: collection
+    path: content/lavori/lavori-manuali
+    format: json
+    filename: { template: "{fields.slug}.json", field: create }
+    view: { fields: [titolo_it, discipline], primary: titolo_it }
+    fields: &all_props_work
+      - { name: titolo_it, component: titolo_it }
+      - { name: titolo_en, component: titolo_en }
+      - { name: slug, component: slug }
+      - { name: discipline, component: discipline }
+      - { name: celle, component: celle }
+      - name: prop
+        label: Prop
+        type: block
+        list: true
+        blockKey: tipo
+        blocks:
+          - { name: splat, component: prop-splat }
+          - { name: libro, component: prop-libro }
+          - { name: crt, component: prop-crt }
+          - { name: biglietto, component: prop-biglietto }
+          - { name: audio, component: prop-audio }
+
+  - name: spazi
+    label: spazi
+    type: collection
+    path: content/lavori/spazi
+    format: json
+    filename: { template: "{fields.slug}.json", field: create }
+    view: { fields: [titolo_it, discipline], primary: titolo_it }
+    fields: *all_props_work
+
+  - name: collezioni
+    label: collezioni di lavori sciolti
+    type: collection
+    path: content/lavori/collezioni
+    format: json
+    filename: { template: "{fields.slug}.json", field: create }
+    view: { fields: [titolo_it, discipline], primary: titolo_it }
+    fields: *all_props_work
+
+  - name: musica
+    label: musica
+    type: collection
+    path: content/lavori/musica
+    format: json
+    filename: { template: "{fields.slug}.json", field: create }
+    view: { fields: [titolo_it, discipline], primary: titolo_it }
+    fields: *all_props_work
+
+  - name: lavagna
+    label: Lavagna (ancore, dallo strumento lavagna)
+    type: file
+    path: content/lavagna.json
+    format: json
+    fields:
+      - name: ancore
+        label: Ancore
+        type: object
+        list: true
+        fields:
+          - { name: chiave, label: Chiave (benvenuto o slug della disciplina), type: string }
+          - { name: c, label: Colonna, type: number }
+          - { name: r, label: Riga, type: number }
+          - { name: w, label: Larghezza (celle), type: number }
+          - { name: h, label: Altezza (celle), type: number }

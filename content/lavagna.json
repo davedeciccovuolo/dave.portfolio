@@ -1,0 +1,32 @@
+{
+  "ancore": [
+    {
+      "chiave": "benvenuto",
+      "c": -1,
+      "r": -1,
+      "w": 3,
+      "h": 2
+    },
+    {
+      "chiave": "design",
+      "c": -8,
+      "r": -6,
+      "w": 2,
+      "h": 1
+    },
+    {
+      "chiave": "artigianato",
+      "c": 5,
+      "r": -5,
+      "w": 3,
+      "h": 1
+    },
+    {
+      "chiave": "musica",
+      "c": -1,
+      "r": 5,
+      "w": 2,
+      "h": 1
+    }
+  ]
+}
